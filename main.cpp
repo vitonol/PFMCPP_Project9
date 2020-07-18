@@ -15,6 +15,7 @@ Make the following program work, which makes use of Variadic templates and Recur
 #include <iostream>
 #include <string>
 #include <typeinfo>
+#include <utility>
 
 struct Point
 {
@@ -39,13 +40,57 @@ private:
     float x{0}, y{0};
 };
 
-template<typename Type>
+// void funcName(T first, Args ... everythingElse)
+// {
+//     funcName( everythingElse... ); //recursive call
+// }
+
+template<typename T, typename ...Args>
+void variadicHelper(T first, Args ... everythingElse)
+{
+    variadicHelper( everythingElse...);
+    Wrapper wrapper; //6) 
+    wrapper(first).print();
+}
+
+Constructor(Args&& ... args) :
+member(std::forward<Args>(args)...)
+
+
+
+// void func(int i)
+//     {
+//         std::cout << "i: " << i << std::endl;
+        
+//         if( i > 0 )
+//         {
+//             func(i-1); //calling itself with an updated value based on the input
+//         }
+        
+//         std::cout << "done!" << std::endl;
+//     }
+
+
+
+
+
+template<typename ... Type>
 struct Wrapper
 {
-    Wrapper(Type&& t) : val(std::move(t)) 
+    Wrapper(Type&& ... t) : val(std::forward<Type>(t)...) 
     { 
         std::cout << "Wrapper(" << typeid(val).name() << ")" << std::endl; 
     }
+
+    print() // 5)
+    {
+        if ( variadicHelper(first) == 3.5)
+        {
+            std::cout <<  "Wrapper::print(3.5)" << std::endl;
+        }
+    }
+
+
 };
 
 /*
