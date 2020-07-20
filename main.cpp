@@ -50,12 +50,24 @@ struct Wrapper
 
     void print() // 5)
     {
-        // if ( variadicHelper(first) == val) 
-        // {
-            std::cout <<  "Wrapper::print(" << val << ")" << std::endl;
-        // }
+        std::cout <<  "Wrapper::print(" << val << ")" << std::endl;
     }
     Type val;
+};
+
+template<>
+struct Wrapper<Point>
+{
+    Wrapper(Point&& t) : val(std::move(t))
+    {
+        std::cout << "Wrapper(" << typeid(val).name() << ")" << std::endl;
+    }
+
+    void print()
+    {
+        std::cout <<  "Wrapper::print(" << val.toString() << ")" << std::endl;
+    }
+    Point val;
 };
 
 
@@ -64,7 +76,7 @@ template<typename T, typename ...Args>
 void variadicHelper(T&& first, Args&& ... everythingElse) // how do I remove 1st element?!
 {
     Wrapper wrapper (std::forward<T>(first) ); //6) 
-    wrapper(first).print();
+    wrapper.print();
     variadicHelper( std::forward<Args>(everythingElse) ...); // recursive call
 }
 
@@ -73,13 +85,17 @@ template<typename T>
 void variadicHelper(T&& first)
 {
     Wrapper wrapper(std::forward<T>(first) );
-    wrapper(first).print();
+    wrapper.print();
 }
 
 
 
 int main()
 {
-    variadicHelper( 3, std::string("burgers"), 2.5, Point{3.f, 0.14f} );
+    variadicHelper( 3, std::string("burgers"), 2.5, Point{3.f, 0.14f} );   
+
+    // variadicHelper(0.3f); //  OK
+    // variadicHelper(0.3f, 4, 7.5, Point{7,4.f}); // OK
+    // variadicHelper(0.3f, 4, 7.5 ); // ERROR
 }
 
