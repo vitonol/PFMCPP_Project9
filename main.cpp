@@ -70,6 +70,13 @@ struct Wrapper<Point>
     Point val;
 };
 
+//+++++++++SINGLE TEMPLATE++++++++++++++++
+template<typename T>
+void variadicHelper(T&& first)
+{
+    Wrapper wrapper(std::forward<T>(first) );
+    wrapper.print();
+}
 
 //+++++++++VARIADIC TEMPLATE+++++++++++++++
 template<typename T, typename ...Args>
@@ -80,22 +87,11 @@ void variadicHelper(T&& first, Args&& ... everythingElse) // how do I remove 1st
     variadicHelper( std::forward<Args>(everythingElse) ...); // recursive call
 }
 
-//+++++++++SINGLE TEMPLATE++++++++++++++++
-template<typename T>
-void variadicHelper(T&& first)
-{
-    Wrapper wrapper(std::forward<T>(first) );
-    wrapper.print();
-}
 
 
 
 int main()
 {
     variadicHelper( 3, std::string("burgers"), 2.5, Point{3.f, 0.14f} );   
-
-    // variadicHelper(0.3f); //  OK
-    // variadicHelper(0.3f, 4, 7.5, Point{7,4.f}); // OK
-    // variadicHelper(0.3f, 4, 7.5 ); // ERROR
 }
 
