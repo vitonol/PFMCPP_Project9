@@ -11,10 +11,11 @@ Purpose:  This project will teach you about variadic templates and recursive tem
 
 Make the following program work, which makes use of Variadic templates and Recursion
  */
-
+ 
 #include <iostream>
 #include <string>
 #include <typeinfo>
+#include <utility>
 
 struct Point
 {
@@ -46,25 +47,51 @@ struct Wrapper
     { 
         std::cout << "Wrapper(" << typeid(val).name() << ")" << std::endl; 
     }
+
+    void print() // 5)
+    {
+        std::cout <<  "Wrapper::print(" << val << ")" << std::endl;
+    }
+    Type val;
 };
 
-/*
- MAKE SURE YOU ARE NOT ON THE MASTER BRANCH
+template<>
+struct Wrapper<Point>
+{
+    Wrapper(Point&& t) : val(std::move(t))
+    {
+        std::cout << "Wrapper(" << typeid(val).name() << ")" << std::endl;
+    }
 
- Commit your changes by clicking on the Source Control panel on the left, entering a message, and click [Commit and push].
- 
- If you didn't already: 
-    Make a pull request after you make your first commit
-    pin the pull request link and this repl.it link to our DM thread in a single message.
+    void print()
+    {
+        std::cout <<  "Wrapper::print(" << val.toString() << ")" << std::endl;
+    }
+    Point val;
+};
 
- send me a DM to review your pull request when the project is ready for review.
+//+++++++++SINGLE TEMPLATE++++++++++++++++
+template<typename T>
+void variadicHelper(T&& first)
+{
+    Wrapper wrapper(std::forward<T>(first) );
+    wrapper.print();
+}
 
- Wait for my code review.
- */
+//+++++++++VARIADIC TEMPLATE+++++++++++++++
+template<typename T, typename ...Args>
+void variadicHelper(T&& first, Args&& ... everythingElse) // how do I remove 1st element?!
+{
+    Wrapper wrapper (std::forward<T>(first) ); //6) 
+    wrapper.print();
+    variadicHelper( std::forward<Args>(everythingElse) ...); // recursive call
+}
+
+
+
 
 int main()
 {
-    variadicHelper( 3, std::string("burgers"), 2.5, Point{3.f, 0.14f} );
+    variadicHelper( 3, std::string("burgers"), 2.5, Point{3.f, 0.14f} );   
 }
-
 
